@@ -205,10 +205,6 @@ Render, plan gratuito, definido en `render.yaml` (Blueprint): instala `requireme
 
 ---
 
-## Atribución de las cartas
-
-Las cartas de los restaurantes 1 y 5 parten del menú del repositorio **PIZZATRO** de **JuanPZ28**, usado con su autorización; solo se tomaron nombres, descripciones y precios (sin imágenes ni diseño), repartidos entre la pizzería y la trattoria. Las cartas 2, 3 y 4 (colombiana, japonesa y parrilla) son texto propio del proyecto con precios de demostración. El seed carga `cartas_demo/<id>.json` en el restaurante con ese id.
-
 ## Créditos
 
 - Tipografías: Google Fonts (VT323, Press Start 2P, Bebas Neue, Inter; licencia OFL). Ilustraciones: SVG/CSS originales.
