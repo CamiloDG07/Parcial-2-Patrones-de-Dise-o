@@ -76,19 +76,19 @@ Hay tres situaciones de acceso: **visitante** (sin sesión), **cliente** y **adm
 
 El mismo formulario de `/login` sirve para clientes y administradores; lo que cambia es el **rol guardado en la base**, y el rol decide adónde llega la persona y qué rutas puede abrir.
 
-### Por qué no existe «registrarse como administrador»
+### Cómo se asigna el rol de administrador (decisión de seguridad)
 
 `/registro` es público y **siempre crea un cliente**: el rol no viaja en el formulario, lo fija el servidor. Es una decisión de seguridad deliberada: si cualquiera pudiera elegir ser administrador, podría adueñarse del panel de un restaurante, ver sus reservas y cambiar su carta. Los administradores solo se crean de dos formas: los **5 de la siembra** (`app/datos/seed.py`) o con el **script de alta** de más abajo. Al iniciar sesión, la fábrica de usuarios (Factory Method) construye un `Administrador`, y es ese objeto el que decide el destino con `ruta_inicio()` → `/admin`.
 
-### Qué lo limita
+### Alcance del rol
 
 - **Un administrador ↔ un restaurante** (`restaurante.admin_id` es `NOT NULL`): solo ve y modifica lo suyo. Si cambia un identificador en la URL para mirar otro restaurante, el Proxy de protección lo rechaza y deja la línea `DENEGADO` en el registro.
-- **No reserva**: `/reservar` responde 403 «Esta sección es solo para clientes». Su trabajo es gestionar las reservas que reciben los clientes.
+- **Rol de gestión**: recibe, confirma y cancela las reservas de los clientes. El formulario de reserva (`/reservar`) es del cliente; el administrador que lo abre recibe 403 «Esta sección es solo para clientes».
 - Un **cliente** que intente abrir `/admin` recibe 403 «ACCESO DENEGADO».
 
 ### Cómo crear más administradores
 
-La aplicación no tiene (a propósito) una pantalla para esto; se hace desde la máquina donde corre el proyecto, con un script corto que usa las mismas funciones de la aplicación (misma conexión, mismo hash `scrypt`). Guárdalo **fuera del repositorio** (o bórralo al terminar) como `nuevo_admin.py`, cambia las cuatro primeras líneas de datos y ejecútalo **desde la carpeta del proyecto**:
+El alta de administradores es una operación **controlada por el operador del sistema**, no por el público: se ejecuta en el servidor con un script de apoyo que usa las mismas funciones de la aplicación (misma conexión, mismo hash `scrypt`) y crea el usuario junto con su restaurante. Guárdalo como `nuevo_admin.py` (fuera del repositorio o bórralo al terminar), cambia los datos de las primeras líneas y ejecútalo **desde la carpeta del proyecto**:
 
 ```python
 from app.datos.conexion import ConexionBD
@@ -113,12 +113,12 @@ print("Administrador creado:", EMAIL)
 python nuevo_admin.py
 ```
 
-Después, la persona entra por `/login` con ese correo y contraseña y **configura su restaurante desde el panel**: mesas, horarios y carta. Condiciones:
+Después, la persona entra por `/login` con ese correo y contraseña y **configura su restaurante desde el panel**: mesas, horarios y carta. Notas:
 
-- Correo único (en minúsculas) y contraseña de al menos 8 caracteres con letras y números (la misma regla que el registro); el script no las valida, así que hay que respetarlas.
-- Un restaurante recién creado no tiene mesas ni horarios, así que **no recibe reservas hasta que el administrador cargue ambos**.
+- Usa un correo único (en minúsculas) y una contraseña de al menos 8 caracteres con letras y números, la misma regla del registro.
+- Un restaurante nuevo empieza sin mesas ni horarios: el administrador los carga desde su panel y desde ese momento el restaurante queda abierto a reservas.
 - El script apunta a la base indicada por `RESERVAS_DB` (o `reservas.db` por defecto).
-- **En Render (plan gratuito) no sirve para cuentas permanentes**: no hay terminal y el disco es efímero. Allí los administradores son los 5 de la siembra; para que uno nuevo sobreviva a los reinicios habría que agregarlo a `app/datos/seed.py`.
+- En la demostración en línea (Render, plan gratuito) los administradores son los 5 de la siembra, que se recrean en cada arranque. Para dejar uno adicional de forma permanente en un despliegue, se agrega a `app/datos/seed.py`.
 
 ## Qué puede hacer cada rol
 
