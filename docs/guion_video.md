@@ -18,7 +18,7 @@ Ten abiertos: el editor en la raíz del proyecto, `docs/diagramas/*.png`, y la a
 ## 1. Presentación (0:30)
 - Proyecto: reservas de restaurantes **MIDNIGHT DINER** (marca ficticia), FastAPI + Jinja2 + SQLite sin ORM, para Patrones de Diseño de Software.
 - Roles: `cliente` y `administrador`. Pantalla: `docs/capturas/02_inicio_1440.png` o la app abierta en el inicio.
-- Decir: son 5 restaurantes, cada uno con su carta (62 platos y 62 fotos con crédito de Wikimedia Commons); las cartas 1 y 5 parten del menú de PIZZATRO (JuanPZ28), usado con su autorización, y las cartas 2, 3 y 4 son texto propio.
+- Decir: son 5 restaurantes, cada uno con su carta (62 platos y 62 fotos con crédito de Wikimedia Commons); las cartas 1 y 5 parten del menú de un repositorio de GitHub de un tercero, usado con su autorización, y las cartas 2, 3 y 4 son texto propio.
 
 ## 2. Arquitectura de tres capas (1:10)
 Mostrar `docs/diagramas/arquitectura_tres_capas.png` y luego el árbol de `app/`:

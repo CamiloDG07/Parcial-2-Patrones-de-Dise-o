@@ -34,5 +34,5 @@ Reglas (las comprueba `tests/test_cartas_demo.py`):
 - **Ningún slug se repite entre restaurantes**: cada carta tiene sus propias fotos.
 - Los nombres de plato no se repiten dentro de un restaurante.
 
-La carta de los restaurantes 1 y 5 parte del menú del repositorio PIZZATRO de JuanPZ28 (usado con su
+La carta de los restaurantes 1 y 5 parte del menú de un repositorio de GitHub de un tercero (usado con su
 autorización; solo nombres, descripciones y precios), repartido entre la pizzería y la trattoria.

@@ -55,7 +55,7 @@ INVITADOS = [("Invitado Uno", "invitado1@demo.com"), ("Invitado Dos", "invitado2
 
 def _sembrar_carta(con) -> None:
     """Carga la carta propia de cada restaurante desde `cartas_demo/<id>.json` (precios en COP enteros).
-    Los restaurantes 1 y 5 parten del menú de PIZZATRO (JuanPZ28, con su autorización)."""
+    Los restaurantes 1 y 5 parten del menú de un repositorio de GitHub de un tercero (usado con su autorización)."""
     for rid in [f[0] for f in con.execute("SELECT id FROM restaurante ORDER BY id")]:
         archivo = CARTAS_DIR / f"{rid}.json"
         if not archivo.is_file():

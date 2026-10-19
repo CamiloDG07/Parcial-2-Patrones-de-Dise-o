@@ -1,7 +1,7 @@
 {
   "restaurante_id": 5,
   "restaurante": "Backstage Pasta & Vino",
-  "origen": "Menú de PIZZATRO (repo JuanPZ28), usado con su autorización. Solo texto y precios; sin imágenes.",
+  "origen": "Menú de un repositorio de GitHub de un tercero, usado con su autorización. Solo texto y precios; sin imágenes.",
   "moneda": "COP (pesos enteros)",
   "categorias": [
     {
