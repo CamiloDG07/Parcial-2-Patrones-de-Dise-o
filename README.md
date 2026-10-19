@@ -205,6 +205,10 @@ Render, plan gratuito, definido en `render.yaml` (Blueprint): instala `requireme
 
 ---
 
+## Atribución de las cartas
+
+Las cartas de los restaurantes 1 y 5 parten del menú de un repositorio de GitHub de un tercero, usado con su autorización; solo se tomaron nombres, descripciones y precios (sin imágenes ni diseño). Las cartas 2, 3 y 4 son propias.
+
 ## Créditos
 
 - Tipografías: Google Fonts (VT323, Press Start 2P, Bebas Neue, Inter; licencia OFL). Ilustraciones: SVG/CSS originales.
