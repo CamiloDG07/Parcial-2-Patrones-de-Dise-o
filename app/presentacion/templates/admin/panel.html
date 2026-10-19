@@ -1,0 +1,102 @@
+{% extends "base.html" %}
+{% block titulo %}Panel{% endblock %}
+{% block contenido %}
+<section class="contenedor">
+  <p class="etiqueta">CAM 05 — SALA DE CONTROL</p>
+  <h1 class="titular">PANEL · {{ restaurante.nombre }}</h1>
+
+  <div class="kpis">
+    <div class="kpi"><span class="kpi-num" data-contar="{{ datos.reservas_hoy }}">{{ datos.reservas_hoy }}</span><span>Reservas de hoy</span></div>
+    <div class="kpi"><span class="kpi-num" data-contar="{{ datos.proximas }}">{{ datos.proximas }}</span><span>Próximas (desde hoy)</span></div>
+    <div class="kpi"><span class="kpi-num" data-contar="{{ datos.ocupacion_pct }}" data-sufijo="%">{{ datos.ocupacion_pct }}%</span><span>Ocupación de hoy</span></div>
+    <div class="kpi"><span class="kpi-num kpi-cop" data-contar="{{ datos.ingresos_cop }}" data-formato="cop">{{ datos.ingresos_cop|cop }}</span><span>Ingresos estimados del pre-pedido</span></div>
+  </div>
+
+  <div class="rejilla-dos">
+    <figure class="panel grafico">
+      <figcaption class="subtitulo">RESERVAS · ÚLTIMOS 14 DÍAS</figcaption>
+      {% set serie = datos.serie_14d %}
+      <svg viewBox="0 0 560 220" role="img" aria-label="Gráfico de barras: reservas por día, últimos 14 días" class="barras-svg">
+        <line x1="30" y1="180" x2="550" y2="180" stroke="#3a2a58"/>
+        {% for d in serie %}
+          {% set h = (d.pct * 1.4)|round|int %}
+          <g>
+            <title>{{ d.fecha }}: {{ d.n }} reserva(s)</title>
+            <rect class="barra-svg" x="{{ 36 + loop.index0 * 37 }}" y="{{ 180 - h }}" width="26" height="{{ h }}" rx="2" style="--i: {{ loop.index0 }}"/>
+            <text x="{{ 49 + loop.index0 * 37 }}" y="{{ 172 - h }}" text-anchor="middle" class="barra-n">{{ d.n if d.n else '' }}</text>
+            <text x="{{ 49 + loop.index0 * 37 }}" y="198" text-anchor="middle" class="barra-f">{{ d.fecha[8:] }}</text>
+          </g>
+        {% endfor %}
+      </svg>
+      <p class="ayuda">Reservas no canceladas por día (el número bajo cada barra es el día del mes).</p>
+    </figure>
+
+    <figure class="panel grafico">
+      <figcaption class="subtitulo">PRODUCTOS MÁS PEDIDOS</figcaption>
+      {% if top %}
+      <ol class="top-lista">
+        {% for t in top %}
+        <li>
+          <span class="top-nombre">{{ t.nombre }}</span>
+          <span class="top-barra" role="img" aria-label="{{ t.n }} unidades"><i style="--pct: {{ t.pct }}%"></i></span>
+          <span class="top-n">{{ t.n }}</span>
+        </li>
+        {% endfor %}
+      </ol>
+      {% else %}<p class="vacio">Aún no hay pre-pedidos.</p>{% endif %}
+    </figure>
+  </div>
+
+
+  <div class="rejilla-dos">
+    <figure class="panel grafico">
+      <figcaption class="subtitulo">RESERVAS POR ESTADO</figcaption>
+      {% if total_estados %}
+      <div class="dona-envoltura">
+        <svg viewBox="0 0 42 42" class="dona-svg" role="img"
+             aria-label="Gráfico de dona: {% for d in dona %}{{ d.estado|lower }} {{ d.n }} ({{ d.pct }} %){% if not loop.last %}, {% endif %}{% endfor %}. Total {{ total_estados }} reservas.">
+          <circle cx="21" cy="21" r="15.9155" fill="none" stroke="#0a0814" stroke-width="6"/>
+          {% for d in dona %}{% if d.n %}
+          <circle class="dona-seg dona-{{ d.estado|lower }}" cx="21" cy="21" r="15.9155" fill="none" stroke-width="6"
+                  stroke-dasharray="{{ d.largo }} {{ (100 - d.largo)|round(2) }}" stroke-dashoffset="{{ (25 - d.inicio)|round(2) }}"><title>{{ d.estado }}: {{ d.n }}</title></circle>
+          {% endif %}{% endfor %}
+          <text x="21" y="22" text-anchor="middle" class="dona-total">{{ total_estados }}</text>
+          <text x="21" y="27" text-anchor="middle" class="dona-sub">reservas</text>
+        </svg>
+        <ul class="dona-leyenda">
+          {% for d in dona %}<li><i class="dona-{{ d.estado|lower }}"></i>{{ d.estado|capitalize }} <strong>{{ d.n }}</strong> <small>({{ d.pct }} %)</small></li>{% endfor %}
+        </ul>
+      </div>
+      <p class="ayuda">Todas las reservas del restaurante, de cualquier fecha.</p>
+      {% else %}<p class="vacio">Aún no hay reservas.</p>{% endif %}
+    </figure>
+
+    <figure class="panel grafico">
+      <figcaption class="subtitulo">OCUPACIÓN POR DÍA Y HORA</figcaption>
+      {% if calor.maximo %}
+      <div class="calor" role="img" aria-label="Mapa de calor: reservas no canceladas por día de la semana y franja de dos horas. El máximo es {{ calor.maximo }} reservas en una celda.">
+        <div class="calor-cab"><span></span>{% for f in calor.franjas %}<span>{{ f }}</span>{% endfor %}</div>
+        {% for fila in calor.celdas %}{% set di = loop.index0 %}
+        <div class="calor-fila"><span class="calor-dia">{{ dias_cortos[di] }}</span>
+          {% for n in fila %}<span class="calor-celda" style="--nivel: {{ (n / calor.maximo)|round(2) }}" title="{{ dias_cortos[di] }} {{ calor.franjas[loop.index0] }}: {{ n }} reserva(s)">{{ n if n else '' }}</span>{% endfor %}
+        </div>
+        {% endfor %}
+      </div>
+      <p class="ayuda">Cada celda cuenta reservas no canceladas (franjas de 2 horas, horas locales); más claro = más reservas.</p>
+      <table class="solo-lectores">
+        <caption>Reservas por día y franja horaria</caption>
+        <thead><tr><th scope="col">Día</th>{% for f in calor.franjas %}<th scope="col">{{ f }}</th>{% endfor %}</tr></thead>
+        <tbody>{% for fila in calor.celdas %}<tr><th scope="row">{{ dias_cortos[loop.index0] }}</th>{% for n in fila %}<td>{{ n }}</td>{% endfor %}</tr>{% endfor %}</tbody>
+      </table>
+      {% else %}<p class="vacio">Aún no hay reservas para el mapa de calor.</p>{% endif %}
+    </figure>
+  </div>
+
+  <div class="acciones">
+    <a class="btn btn-rojo" href="/admin/reservas">GESTIONAR RESERVAS{% if datos.pendientes %} ({{ datos.pendientes }} PENDIENTES){% endif %}</a>
+    <a class="btn btn-claro" href="/admin/carta">CARTA</a>
+    <a class="btn btn-claro" href="/admin/mesas">MESAS ({{ mesas }})</a>
+    <a class="btn btn-claro" href="/admin/horarios">HORARIOS</a>
+  </div>
+</section>
+{% endblock %}
